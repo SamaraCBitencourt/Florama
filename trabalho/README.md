@@ -1,5 +1,7 @@
 # Welcome to your Expo app 👋
 
+Para publicar a API e configurar o banco, siga o [guia de publicação](DEPLOY.md). O Blueprint do Render está em `render.yaml`.
+
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
 ## Get started

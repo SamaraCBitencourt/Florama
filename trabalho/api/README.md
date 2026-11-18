@@ -1,11 +1,11 @@
 # Florama API
 
-API FastAPI conectada ao PostgreSQL `florama`. Ela usa as tabelas já criadas: `categorias`, `produtos`, `perfis`, `favoritos`, `carrinhos`, `itens_carrinho`, `vendas` e `itens_venda`.
+API FastAPI conectada ao PostgreSQL `florama`. Para criar um banco vazio, execute as migrações `000_initial_schema.sql`, `001_auth_profile.sql` e `002_admin_payment_audit.sql`, nessa ordem. Para publicar API e banco no Render, siga o [guia de publicação](../DEPLOY.md).
 
 ## Preparar uma vez
 
-1. Copie `api/.env.example` para `api/.env` e preencha a senha do PostgreSQL e uma chave secreta JWT longa. Não compartilhe nem versione `api/.env`.
-2. No pgAdmin, abra o banco `florama`, abra o Query Tool e execute, nesta ordem, `api/migrations/001_auth_profile.sql` e `api/migrations/002_admin_payment_audit.sql`. A segunda migração adiciona o papel de usuário e os campos de auditoria do pagamento.
+1. Copie `.env.example` desta pasta (`api/.env.example`) para `api/.env` e preencha a senha do PostgreSQL e uma chave secreta JWT longa. Não compartilhe nem versione `api/.env`.
+2. No pgAdmin, abra o banco `florama`, abra o Query Tool e execute, nesta ordem, `api/migrations/000_initial_schema.sql`, `api/migrations/001_auth_profile.sql` e `api/migrations/002_admin_payment_audit.sql`.
 3. Na pasta do projeto, instale os pacotes Python:
 
    ```powershell
