@@ -33,7 +33,7 @@ services:
       - key: EXPO_PUBLIC_API_URL
         value: https://florama-api.onrender.com
       - key: EXPO_PUBLIC_WHATSAPP_NUMBER
-        value: ""
+        value: "5591991128090"
 
 databases:
   - name: florama-db
