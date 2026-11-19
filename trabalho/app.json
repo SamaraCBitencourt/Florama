@@ -20,6 +20,7 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
+      "name": "Florama",
       "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
