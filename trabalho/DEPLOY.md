@@ -1,39 +1,30 @@
 # Publicar a Florama no Render
 
-O arquivo `render.yaml` prepara uma API FastAPI e um PostgreSQL no Render. O Blueprint cria os dois serviços e conecta o banco à API automaticamente. A publicação ainda exige acesso à sua conta Render e ao repositório GitHub.
+O Blueprint na raiz do repositório configura a API (`florama-api`), o PostgreSQL (`florama-db`) e agora também o site web (`florama-site`). A API e o banco já foram criados. As etapas restantes são enviar a configuração web e sincronizar o Blueprint.
 
-## 1. Enviar o projeto ao GitHub
+## 1. Enviar as alterações ao GitHub
 
-1. Abra `Phil-Souza/Florama` no GitHub e confira se o conteúdo desta pasta (`trabalho`) está na raiz do repositório, incluindo `render.yaml`.
-2. Se ainda não estiver no GitHub, crie um repositório e envie o conteúdo da pasta `trabalho`. Não envie arquivos `.env` nem senhas.
+No GitHub Desktop, confira e envie estas alterações:
 
-## 2. Criar API e banco no Render
+- `render.yaml` na raiz do repositório;
+- `trabalho/render.yaml`;
+- `trabalho/app.json`;
+- `trabalho/DEPLOY.md`.
 
-1. Entre no Render e escolha **New → Blueprint**.
-2. Conecte o repositório GitHub que contém `render.yaml` e confirme a criação dos recursos `florama-api` e `florama-db`.
-3. O Blueprint gera o `JWT_SECRET` e preenche `DATABASE_URL` com a conexão privada ao PostgreSQL.
-4. Quando o deploy terminar, abra `florama-db` no Render e copie a **External Database URL**. No pgAdmin, crie uma conexão PostgreSQL usando os dados dessa URL: host, porta, nome do banco, usuário e senha.
-5. No pgAdmin, abra o Query Tool nessa conexão. Abra e execute com **F5** estes arquivos, um por vez e nesta ordem: `api/migrations/000_initial_schema.sql`, `api/migrations/001_auth_profile.sql` e `api/migrations/002_admin_payment_audit.sql`. O primeiro cria as tabelas e carrega o catálogo inicial; os outros dois preparam cadastro, autenticação e auditoria.
-6. Abra a URL pública de `florama-api` seguida de `/health`. A resposta esperada é `{"status":"ok","database":"connected"}`.
+Crie um commit e clique em **Push origin**. Não envie arquivos `.env` ou `.env.local`.
 
-**Atenção ao plano gratuito:** o PostgreSQL gratuito do Render expira após 30 dias. Depois da expiração, há 14 dias para fazer upgrade antes da exclusão do banco e dos dados. Se precisar manter os dados por mais tempo, faça upgrade do banco no Render antes do prazo ou exporte um backup.
+## 2. Criar o site no Render
 
-## 3. Apontar o app para a API
+1. Abra o Blueprint **FlorAma** no Render e clique em **Manual sync**.
+2. Confira que a sincronização vai criar `florama-site`. A configuração usa um site estático gratuito e compila o app Expo para web.
+3. Aguarde o deploy de `florama-site` terminar. Abra a URL pública que o Render mostrar, por exemplo `https://florama-site.onrender.com`.
+4. Teste o cadastro e a navegação. O site já recebe `EXPO_PUBLIC_API_URL=https://florama-api.onrender.com` durante a compilação, então não é necessário criar `.env.local` no Render.
 
-Na pasta do app (`trabalho`), crie ou edite `.env.local`:
+O endereço `http://localhost:8081` continua servindo apenas para desenvolvimento no seu computador. Para alterar o endereço da API usado pelo site publicado, mude `EXPO_PUBLIC_API_URL` no `render.yaml` e envie uma nova alteração; o Render recompila o site.
 
-```env
-EXPO_PUBLIC_API_URL=https://SUA-URL-DA-API.onrender.com
-EXPO_PUBLIC_WHATSAPP_NUMBER=
-```
+## 3. Conferir a conta administradora
 
-Substitua pela URL pública exibida pelo Render. O número de WhatsApp é opcional; para habilitá-lo, use DDI + DDD + número, somente dígitos. Não coloque senhas ou chaves secretas em variáveis `EXPO_PUBLIC_`.
-
-Para rodar o app localmente, na pasta `trabalho`, execute `npm install` e `npm run web`. Este Blueprint publica a API e o banco; publicar o app web é uma etapa separada.
-
-## 4. Criar a conta administradora
-
-Depois que as migrações forem executadas e a API estiver conectada ao banco, crie uma conta pelo app. No cliente SQL conectado ao banco Render, promova somente essa conta:
+Se as migrações `001_auth_profile.sql` e `002_admin_payment_audit.sql` já foram executadas, crie uma conta pelo site. Depois, no Query Tool do pgAdmin conectado ao banco Render, promova essa conta:
 
 ```sql
 UPDATE public.perfis
@@ -43,3 +34,18 @@ RETURNING id, email, papel;
 ```
 
 Confirme que somente a conta desejada voltou com `papel = admin`.
+
+## Desenvolvimento local
+
+Para que o app local use a API publicada, mantenha um `.env.local` na pasta do app, junto ao `package.json`:
+
+```env
+EXPO_PUBLIC_API_URL=https://florama-api.onrender.com
+EXPO_PUBLIC_WHATSAPP_NUMBER=
+```
+
+Essas variáveis são públicas e podem ser incluídas no bundle web. Nunca coloque senhas ou chaves secretas em variáveis `EXPO_PUBLIC_`.
+
+## Limite do banco gratuito
+
+O PostgreSQL gratuito do Render expira 30 dias após a criação. Depois da expiração, há um prazo de 14 dias para fazer upgrade antes que o banco e os dados sejam excluídos. Consulte os [limites do plano gratuito do Render](https://render.com/docs/free).
